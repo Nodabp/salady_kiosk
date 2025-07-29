@@ -13,7 +13,7 @@ export function Test() {
                 console.error("메뉴 가져오기 실패:", err);
             }
         }
-        fetchMenu();
+        fetchMenu().then(fetchMenu).catch(console.error);
     }, []);
 
     return (
