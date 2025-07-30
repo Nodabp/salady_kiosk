@@ -20,15 +20,18 @@ export default function OptionModal({ menu, onClose, onAddToCart }) {
         return found?.quantity ?? 0;
     };
 
-    // 총 가격 계산
+    // 총액 계산
     const totalPrice = useMemo(() => {
-        const base = menu.price * quantity;
-        const optionsTotal = selections.reduce((sum, s) => {
+        // 옵션 단가 = Σ(옵션 개당 가격 × 옵션 개수)
+        const optionUnitPrice = selections.reduce((sum, s) => {
             const opt = menu.menuOptions.find((o) => o.id === s.optionId);
             return sum + (opt?.extraPrice || 0) * s.quantity;
         }, 0);
-        return base + optionsTotal;
+
+        // 메뉴 총액 = (기본 가격 + 옵션 단가) × 메뉴 수량
+        return (menu.price + optionUnitPrice) * quantity;
     }, [menu, quantity, selections]);
+
 
     const handleSubmit = () => {
         const orderData = {
@@ -36,9 +39,21 @@ export default function OptionModal({ menu, onClose, onAddToCart }) {
             name: menu.name,
             basePrice: menu.price,
             quantity,
-            options: selections,
-            totalPrice,
+            options: selections.map((s) => {
+                const opt = menu.menuOptions.find((o) => o.id === s.optionId);
+                return {
+                    optionId: s.optionId,
+                    quantity: s.quantity,
+                    extraPrice: opt ? opt.extraPrice : 0,
+                    name: opt ? opt.name : "",
+                };
+            }),
+            totalPrice: (menu.price + selections.reduce((sum, s) => {
+                const opt = menu.menuOptions.find((o) => o.id === s.optionId);
+                return sum + (opt?.extraPrice || 0) * s.quantity;
+            }, 0)) * quantity,
         };
+
         onAddToCart(orderData);
         onClose();
     };

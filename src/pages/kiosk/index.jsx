@@ -5,7 +5,7 @@ import MenuItemList from "./MenuItemList";
 import OptionModal from "./OptionModal";
 import CartPanel from "./CartPanel";
 import CartModal from "./CartModal";
-import Header from "../../components/Header.jsx";
+import Header from "./Header.jsx";
 
 export default function KioskPage() {
     const [categoryTree, setCategoryTree] = useState([]);
@@ -29,26 +29,39 @@ export default function KioskPage() {
 
     const handleAddToCart = (menuData) => {
         setCartItems((prev) => {
-            // 옵션까지 동일한지 비교
             const index = prev.findIndex((item) =>
                 item.menuId === menuData.menuId &&
                 JSON.stringify(item.options) === JSON.stringify(menuData.options)
             );
 
+            // 옵션 단가
+            const optionUnitPrice = menuData.options.reduce((sum, opt) => {
+                return sum + (opt.extraPrice || 0) * opt.quantity;
+            }, 0);
+
             if (index !== -1) {
-                // 기존 아이템 수량 + 가격 업데이트
                 const updated = [...prev];
+                const newQuantity = updated[index].quantity + menuData.quantity;
+
                 updated[index] = {
                     ...updated[index],
-                    quantity: updated[index].quantity + menuData.quantity,
-                    totalPrice: updated[index].totalPrice + menuData.totalPrice,
+                    quantity: newQuantity,
+                    totalPrice: (menuData.basePrice + optionUnitPrice) * newQuantity,
                 };
                 return updated;
             } else {
-                return [...prev, menuData];
+                return [
+                    ...prev,
+                    {
+                        ...menuData,
+                        totalPrice: (menuData.basePrice + optionUnitPrice) * menuData.quantity,
+                    },
+                ];
             }
         });
     };
+
+
 
     const handleCheckout = () => {
         console.log("주문 데이터:", cartItems);
@@ -58,14 +71,72 @@ export default function KioskPage() {
     const selectedCategory = categoryTree.find((cat) => cat.id === selectedCategoryId);
     const menus = selectedCategory?.menus ?? [];
 
+    const handleUpdateItem = (index, newQuantity) => {
+        setCartItems((prev) => {
+            const updated = [...prev];
 
-    function optionIdToName(optionId) {
-        categoryTree.forEach((cat) => {
-            cat.options.forEach((opt) => {
-                if(opt.id === optionId) {return opt.name}else{return "옵션"}
-            })
-        })
-    }
+            if (newQuantity <= 0) {
+                updated.splice(index, 1);
+                return updated;
+            }
+
+            const item = updated[index];
+
+            // 메뉴 1개당 옵션 가격 합계
+            const optionUnitPrice = item.options.reduce((sum, opt) => {
+                return sum + (opt.extraPrice || 0) * opt.quantity;
+            }, 0);
+
+            // 총액 = (기본 가격 + 옵션 단가) × 수량
+            updated[index] = {
+                ...item,
+                quantity: newQuantity,
+                totalPrice: (item.basePrice + optionUnitPrice) * newQuantity,
+            };
+
+            return updated;
+        });
+    };
+
+
+
+    const handleRemoveItem = (index) => {
+        setCartItems((prev) => {
+            const updated = [...prev];
+            updated.splice(index, 1);
+            return updated;
+        });
+    };
+
+    const handleUpdateOption = (itemIndex, optionIndex, newQuantity) => {
+        setCartItems((prev) => {
+            const updated = [...prev];
+            const item = { ...updated[itemIndex] };
+            const options = [...item.options];
+
+            if (newQuantity <= 0) {
+                options.splice(optionIndex, 1); // 옵션 제거
+            } else {
+                options[optionIndex] = {
+                    ...options[optionIndex],
+                    quantity: newQuantity,
+                };
+            }
+
+            // 메뉴 1개당 옵션 가격 합계
+            const optionUnitPrice = options.reduce((sum, opt) => {
+                return sum + (opt.extraPrice || 0) * opt.quantity;
+            }, 0);
+
+            item.options = options;
+            item.totalPrice = (item.basePrice + optionUnitPrice) * item.quantity;
+
+            updated[itemIndex] = item;
+            return updated;
+        });
+    };
+
+
 
     return (
         <div className="bg-white min-h-screen text-black pb-24">
@@ -91,9 +162,12 @@ export default function KioskPage() {
                 <CartModal
                     cartItems={cartItems}
                     onClose={() => setIsCartModalOpen(false)}
-                    optionIdToName={optionIdToName}
+                    onUpdateItem={handleUpdateItem}
+                    onRemoveItem={handleRemoveItem}
+                    onUpdateOption={handleUpdateOption}
                 />
             )}
+
         </div>
     );
 }
