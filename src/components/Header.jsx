@@ -2,9 +2,9 @@
 
 export default function Header() {
     return (
-        <header className="flex items-center justify-start mb-4">
-            {/*<img src={logo} alt="Salady Logo" className="h-10" />*/}
-            <h1 className="">키오스크 헤더</h1>
+        <header className="flex items-center justify-center bg-green-900 text-white py-4 shadow-md">
+            <img src="/img/logo.png" alt="logo" className="h-12 w-12 mr-3" />
+            <h1 className="text-3xl font-bold tracking-wide">SALADAY</h1>
         </header>
     );
 }

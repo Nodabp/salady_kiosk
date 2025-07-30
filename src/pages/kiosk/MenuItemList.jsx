@@ -4,20 +4,20 @@ export default function MenuItemList({ menus, onClickMenu }) {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6 px-6 py-4">
             {menus.map((menu) => (
                 <button
                     key={menu.id}
                     onClick={() => onClickMenu(menu)}
-                    className="bg-white border rounded-lg shadow hover:shadow-md transition p-4 text-left"
+                    className="bg-white border border-green-100 rounded-2xl shadow hover:shadow-lg transition p-4 text-left"
                 >
                     <img
                         src={menu.imageUrl ?? "/images/placeholder.png"}
                         alt={menu.name}
-                        className="w-full h-28 object-cover rounded-md mb-2"
+                        className="w-full h-40 object-cover rounded-lg mb-3"
                     />
-                    <div className="font-semibold">{menu.name}</div>
-                    <div className="text-sm text-gray-600 mt-1">{menu.price.toLocaleString()}원</div>
+                    <div className="text-xl font-bold text-green-900">{menu.name}</div>
+                    <div className="text-lg text-gray-700 mt-2">{menu.price.toLocaleString()}원</div>
                 </button>
             ))}
         </div>
