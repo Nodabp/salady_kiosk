@@ -29,10 +29,9 @@ export default function OrderConfirmModal({cartItems, finalPrice, onConfirm, onC
                     )}
                     {priceDetails.map((item, idx) => (
                         <div key={idx} className="mb-2">
-                            <p className="font-semibold text-sm">{item.name}</p>
                             <ul className="text-xs text-green-700 ml-2">
                                 {item.appliedDiscounts.map((discount, i) => (
-                                    <li key={i}>- {discount.note}: {discount.amount}원 할인</li>
+                                    <li key={i}> - {discount.note}: {discount.amount}원 할인</li>
                                 ))}
                             </ul>
                         </div>

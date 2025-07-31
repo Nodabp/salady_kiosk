@@ -7,7 +7,7 @@ import {Test2} from "./components/Test2.jsx";
 import Index from "./pages/kiosk/index.jsx";
 
 export const router = createBrowserRouter([
-    { path: "/test1", element: <Test/> },
+    { path: "/test", element: <Test/> },
     { path: "/toss/Checkout", element: <CheckoutPage /> },
     { path: "/toss/success", element: <SuccessPage /> },
     { path: "/toss/fail", element: <FailPage /> },

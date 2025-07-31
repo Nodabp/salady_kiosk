@@ -1,4 +1,3 @@
-// PointInputModal.jsx
 import {useState} from "react";
 import axios from "axios";
 export default function PointInputModal({ user, cartItems, onBack, onConfirm }) {
@@ -31,10 +30,10 @@ export default function PointInputModal({ user, cartItems, onBack, onConfirm }) 
     };
 
     return (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" >
             <div className="bg-white w-full max-w-sm p-6 rounded-lg shadow-xl text-black">
                 <h2 className="text-xl font-bold mb-4 text-center">포인트 사용</h2>
-                <p className="mb-2">회원명: {user.name}</p>
+                <p className="mb-2">회원명 : {user.name}</p>
                 <p className="mb-2">보유 포인트: {user.availablePoints} P</p>
                 <input
                     type="number"
@@ -44,6 +43,23 @@ export default function PointInputModal({ user, cartItems, onBack, onConfirm }) 
                     className="w-full border rounded px-3 py-2 mb-2"
                 />
                 {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                    {[1,2,3,4,5,6,7,8,9,0].map(num => (
+                        <button
+                            key={num}
+                            onClick={() => setPointInput(prev => (prev + num).slice(0, 11))}
+                            className="bg-gray-50 rounded p-2 text-xl font-bold hover:bg-green-100"
+                        >
+                            {num}
+                        </button>
+                    ))}
+                    <button
+                        onClick={() => setPointInput(prev => prev.slice(0, -1))}
+                        className="bg-white-100 border rounded p-2 text-sm hover:bg-red-200"
+                    >
+                        ← 삭제
+                    </button>
+                </div>
                 <div className="flex space-x-2 mt-4">
                     <button onClick={onBack} className="flex-1 py-2 bg-gray-200 rounded">뒤로</button>
                     <button onClick={handleApply} className="flex-1 py-2 bg-green-600 text-white rounded">적용</button>

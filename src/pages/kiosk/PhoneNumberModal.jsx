@@ -64,18 +64,36 @@ export default function PhoneNumberModal({ onClose, cartItems }) {
         });
         setFinalPrice(priceRes.data.finalTotalPrice);
         setIsMember(false);
+        setPriceDetails(priceRes.data.details); // 할인 내역 포함
         setIsConfirmOpen(true);
+
     };
 
-    const handleConfirmPayment = () => {
-        console.log("결제 데이터:", {
-            user: isMember ? user : null,
-            pointUsed: isMember ? pointInput : 0,
-            finalPrice,
-            items: cartItems,
+    const handleConfirmPayment = async () => {
+        try {
+            const userRes = await axios.get(`http://localhost:8080/api/users/lookup?phoneNumber=${phone}`);
+            const { name , id } = userRes.data;
+            const res = await axios.post("http://localhost:8080/api/order", {
+                userId: isMember ? id : null,
+                customerName: isMember ? name : "비회원",
+                customerMobile: phone,  // 적절한 값으로 치환
+                customerEmail: "",
+                pointAmount: isMember ? Number(pointInput) : 0,
+                items: cartItems.map(item => ({
+                    menuId: item.menuId,
+                    quantity: item.quantity,
+                    options: item.options.map(opt => ({
+                        optionId: opt.optionId,
+                        quantity: opt.quantity
+                    }))
+                }))
+            });
 
-        });
-        window.location.href = "/checkout";
+            const { orderId, totalPrice } = res.data;
+            window.location.href = `/toss/checkout?orderId=${orderId}&amount=${totalPrice}&name=${encodeURIComponent(name || "비회원")}&phoneNumber=${phone}`;
+        } catch (err) {
+            console.warn("주문 생성에 실패했어요!");
+        }
     };
 
     return (
@@ -125,14 +143,21 @@ export default function PhoneNumberModal({ onClose, cartItems }) {
                         </div>
                     ) : (
                         <div className="mt-4">
-                            <p className="mb-2">회원명: {user.name}</p>
                             <p className="mb-2">사용 가능 포인트: {user.availablePoints} P</p>
                             <button
                                 onClick={() => setIsPointModalOpen(true)}
-                                className="px-4 py-2 bg-green-600 text-white rounded w-full"
+                                className="px-4 py-2 bg-green-600 text-white rounded"
                             >
                                 포인트 사용하기
                             </button>
+
+                            <button
+                                onClick={() => setIsConfirmOpen(true)}
+                                className="px-4 py-2 bg-green-600 text-white rounded"
+                            >
+                                바로 결제하기
+                            </button>
+
                             <button onClick={onClose} className="w-full mt-2 py-2 bg-gray-200 rounded">
                                 취소
                             </button>
