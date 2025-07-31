@@ -29,15 +29,16 @@ export default function KioskPage() {
 
     const handleAddToCart = (menuData) => {
         setCartItems((prev) => {
-            const index = prev.findIndex((item) =>
-                item.menuId === menuData.menuId &&
-                JSON.stringify(item.options) === JSON.stringify(menuData.options)
+            const index = prev.findIndex(
+                (item) =>
+                    item.menuId === menuData.menuId &&
+                    JSON.stringify(item.options) === JSON.stringify(menuData.options)
             );
 
-            // 옵션 단가
-            const optionUnitPrice = menuData.options.reduce((sum, opt) => {
-                return sum + (opt.extraPrice || 0) * opt.quantity;
-            }, 0);
+            const optionUnitPrice = menuData.options.reduce(
+                (sum, opt) => sum + (opt.extraPrice || 0) * opt.quantity,
+                0
+            );
 
             if (index !== -1) {
                 const updated = [...prev];
@@ -61,44 +62,38 @@ export default function KioskPage() {
         });
     };
 
-
-
-    const handleCheckout = () => {
-        console.log("주문 데이터:", cartItems);
-        // TODO: 결제 페이지 이동 or 서버 전송
+    //  장바구니 모달 열기
+    const handleOpenCartModal = () => {
+        setIsCartModalOpen(true);
+        console.log("모달열기")
     };
 
-    const selectedCategory = categoryTree.find((cat) => cat.id === selectedCategoryId);
-    const menus = selectedCategory?.menus ?? [];
+    //  장바구니 모달 닫기
+    const handleCloseCartModal = () => {
+        setIsCartModalOpen(false);
+        console.log("모달닫기")
+    };
 
     const handleUpdateItem = (index, newQuantity) => {
         setCartItems((prev) => {
             const updated = [...prev];
-
             if (newQuantity <= 0) {
                 updated.splice(index, 1);
                 return updated;
             }
-
             const item = updated[index];
-
-            // 메뉴 1개당 옵션 가격 합계
-            const optionUnitPrice = item.options.reduce((sum, opt) => {
-                return sum + (opt.extraPrice || 0) * opt.quantity;
-            }, 0);
-
-            // 총액 = (기본 가격 + 옵션 단가) × 수량
+            const optionUnitPrice = item.options.reduce(
+                (sum, opt) => sum + (opt.extraPrice || 0) * opt.quantity,
+                0
+            );
             updated[index] = {
                 ...item,
                 quantity: newQuantity,
                 totalPrice: (item.basePrice + optionUnitPrice) * newQuantity,
             };
-
             return updated;
         });
     };
-
-
 
     const handleRemoveItem = (index) => {
         setCartItems((prev) => {
@@ -115,7 +110,7 @@ export default function KioskPage() {
             const options = [...item.options];
 
             if (newQuantity <= 0) {
-                options.splice(optionIndex, 1); // 옵션 제거
+                options.splice(optionIndex, 1);
             } else {
                 options[optionIndex] = {
                     ...options[optionIndex],
@@ -123,10 +118,10 @@ export default function KioskPage() {
                 };
             }
 
-            // 메뉴 1개당 옵션 가격 합계
-            const optionUnitPrice = options.reduce((sum, opt) => {
-                return sum + (opt.extraPrice || 0) * opt.quantity;
-            }, 0);
+            const optionUnitPrice = options.reduce(
+                (sum, opt) => sum + (opt.extraPrice || 0) * opt.quantity,
+                0
+            );
 
             item.options = options;
             item.totalPrice = (item.basePrice + optionUnitPrice) * item.quantity;
@@ -136,12 +131,17 @@ export default function KioskPage() {
         });
     };
 
-
+    const selectedCategory = categoryTree.find((cat) => cat.id === selectedCategoryId);
+    const menus = selectedCategory?.menus ?? [];
 
     return (
         <div className="bg-white min-h-screen text-black pb-24">
             <Header />
-            <CategoryList categories={categoryTree} selectedId={selectedCategoryId} onSelect={setSelectedCategoryId} />
+            <CategoryList
+                categories={categoryTree}
+                selectedId={selectedCategoryId}
+                onSelect={setSelectedCategoryId}
+            />
             <MenuItemList menus={menus} onClickMenu={(menu) => setSelectedMenu(menu)} />
 
             {selectedMenu && (
@@ -152,22 +152,21 @@ export default function KioskPage() {
                 />
             )}
 
+            {/* CartPanel에 함수 전달 */}
             <CartPanel
                 cartItems={cartItems}
-                onOpenModal={() => setIsCartModalOpen(true)}
-                onCheckout={handleCheckout}
+                onOpenModal={handleOpenCartModal}
             />
 
             {isCartModalOpen && (
                 <CartModal
                     cartItems={cartItems}
-                    onClose={() => setIsCartModalOpen(false)}
+                    onClose={handleCloseCartModal}
                     onUpdateItem={handleUpdateItem}
                     onRemoveItem={handleRemoveItem}
                     onUpdateOption={handleUpdateOption}
                 />
             )}
-
         </div>
     );
 }
