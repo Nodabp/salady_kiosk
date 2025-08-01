@@ -64,7 +64,7 @@ export default function OptionModal({ menu, onClose, onAddToCart }) {
                 <h2 className="text-2xl font-bold text-green-900 mb-2">{menu.name}</h2>
                 <p className="text-gray-600 mb-4">{menu.description}</p>
                 <img
-                    src={menu.imageUrl ?? "/images/placeholder.png"}
+                    src={menu.imageUrl ?? "/img/placeholder.png"}
                     alt={menu.name}
                     className="w-full h-48 object-cover rounded-lg mb-4"
                 />

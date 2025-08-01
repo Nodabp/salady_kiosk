@@ -1,9 +1,9 @@
-import { useState } from "react";
+import {useState} from "react";
 import axios from "axios";
 import OrderConfirmModal from "./OrderConfirmModal";
 import PointInputModal from "./PointInputModal";
 
-export default function PhoneNumberModal({ onClose, cartItems }) {
+export default function PhoneNumberModal({onClose, cartItems}) {
     const [phone, setPhone] = useState("");
     const [error, setError] = useState("");
     const [isMember, setIsMember] = useState(false);
@@ -40,7 +40,7 @@ export default function PhoneNumberModal({ onClose, cartItems }) {
                 }))
             });
 
-            setUser({ ...foundUser, availablePoints });
+            setUser({...foundUser, availablePoints});
             setIsMember(true);
             setFinalPrice(priceRes.data.finalTotalPrice);
             setPriceDetails(priceRes.data.details); // 할인 내역 포함
@@ -71,12 +71,18 @@ export default function PhoneNumberModal({ onClose, cartItems }) {
 
     const handleConfirmPayment = async () => {
         try {
-            const userRes = await axios.get(`http://localhost:8080/api/users/lookup?phoneNumber=${phone}`);
-            const { name , id } = userRes.data;
+
+            let userRes;
+            let name, id;
+            if (phone) {
+                userRes = await axios.get(`http://localhost:8080/api/users/lookup?phoneNumber=${phone}`);
+                ({ name, id } = userRes.data); // 구조 분해 할당
+            }
+
             const res = await axios.post("http://localhost:8080/api/order", {
                 userId: isMember ? id : null,
                 customerName: isMember ? name : "비회원",
-                customerMobile: phone,  // 적절한 값으로 치환
+                customerMobile: phone ?? "010-0000-0000",
                 customerEmail: "",
                 pointAmount: isMember ? Number(pointInput) : 0,
                 items: cartItems.map(item => ({
@@ -89,10 +95,10 @@ export default function PhoneNumberModal({ onClose, cartItems }) {
                 }))
             });
 
-            const { orderId, totalPrice } = res.data;
-            window.location.href = `/toss/checkout?orderId=${orderId}&amount=${totalPrice}&name=${encodeURIComponent(name || "비회원")}&phoneNumber=${phone}`;
+            const {orderId, totalPrice} = res.data;
+            window.location.href = `/toss/checkout?orderId=${orderId}&amount=${totalPrice}&name=${encodeURIComponent(name || "비회원")}&phoneNumber=${phone ?? "010-0000-0000"}`;
         } catch (err) {
-            console.warn("주문 생성에 실패했어요!");
+            console.warn("주문 생성에 실패했어요!",err);
         }
     };
 
@@ -112,7 +118,7 @@ export default function PhoneNumberModal({ onClose, cartItems }) {
                     {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
                     <div className="grid grid-cols-3 gap-2 mb-4">
-                        {[1,2,3,4,5,6,7,8,9,0].map(num => (
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(num => (
                             <button
                                 key={num}
                                 onClick={() => setPhone(prev => (prev + num).slice(0, 11))}
@@ -134,7 +140,8 @@ export default function PhoneNumberModal({ onClose, cartItems }) {
                             <button onClick={handleLookup} className="w-full px-4 py-2 bg-green-800 text-white rounded">
                                 결제 (회원)
                             </button>
-                            <button onClick={handleGuestCheckout} className="w-full px-4 py-2 bg-gray-400 text-white rounded">
+                            <button onClick={handleGuestCheckout}
+                                    className="w-full px-4 py-2 bg-gray-400 text-white rounded">
                                 비회원 결제
                             </button>
                             <button onClick={onClose} className="w-full px-4 py-2 bg-gray-200 rounded">

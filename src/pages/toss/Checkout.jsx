@@ -83,39 +83,6 @@ export function CheckoutPage() {
     }, [widgets, amount]);
 
     return (
-
-        // <div className="wrapper">
-        //     <div className="box_section">
-        //         {/* 결제 UI */}
-        //         <div id="payment-method" />
-        //         {/* 이용약관 UI */}
-        //         <div id="agreement" />
-        //         {/* 결제하기 버튼 */}
-        //         <button
-        //             className="rounded-lg p-6 shadow-xl text-white bg-black"
-        //             disabled={!ready}
-        //             onClick={async () => {
-        //                 try {
-        //
-        //                     await widgets.requestPayment({
-        //                         orderId,
-        //                         orderName: "샐러데이 주문",
-        //                         successUrl: window.location.origin + "/toss/success",
-        //                         failUrl: window.location.origin + "/toss/fail",
-        //                         customerEmail: "1@1.com",
-        //                         customerName,
-        //                         customerMobilePhone: phone
-        //                     });
-        //                 } catch (error) {
-        //                     console.error(error);
-        //                 }
-        //             }}
-        //         >
-        //             결제하기
-        //         </button>
-        //     </div>
-        // </div>
-
         <div className="flex flex-col items-center justify-center min-h-screen bg-green-50 px-6 py-10">
             <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md">
                 <h2 className="text-3xl font-extrabold text-green-800 text-center mb-8">
