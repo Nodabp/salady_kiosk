@@ -5,19 +5,21 @@ export function Complete() {
 	const navigate = useNavigate();
 	const [countdown, setCountdown] = useState(5);
 
+	// 1초마다 countdown 감소
 	useEffect(() => {
 		const timer = setInterval(() => {
-			setCountdown((prev) => {
-				if (prev <= 1) {
-					clearInterval(timer);
-					navigate("/");
-				}
-				return prev - 1;
-			});
+			setCountdown((prev) => Math.max(prev - 1, 0));
 		}, 1000);
 
 		return () => clearInterval(timer);
-	}, [navigate]);
+	}, []);
+
+	// countdown이 0이 되면 메인 페이지로 이동
+	useEffect(() => {
+		if (countdown <= 0) {
+			navigate("/");
+		}
+	}, [countdown, navigate]);
 
 	return (
 		<div className="min-h-screen bg-green-900 flex items-center justify-center">

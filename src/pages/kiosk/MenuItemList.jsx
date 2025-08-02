@@ -14,7 +14,7 @@ export default function MenuItemList({ menus, onClickMenu }) {
                         ${menu.active ? "hover:shadow-lg" : "opacity-50 cursor-not-allowed"}`}
                 >
                     <img
-                        src={menu.imageUrl ?? "/images/placeholder.png"}
+                        src={menu.imageUrl ?? "/img/placeholder.png"}
                         alt={menu.name}
                         className="w-full h-40 object-cover rounded-lg mb-3"
                     />

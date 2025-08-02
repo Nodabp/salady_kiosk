@@ -17,7 +17,7 @@ export default function KioskPage() {
     useEffect(() => {
         async function fetchCategories() {
             try {
-                const res = await axios.get("http://localhost:8080/api/kiosk/menus/category/active");
+                const res = await axios.get("http://localhost:8080/api/menus/all");
                 setCategoryTree(res.data);
                 if (res.data.length > 0) setSelectedCategoryId(res.data[0].id);
             } catch (error) {
