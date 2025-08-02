@@ -1,5 +1,6 @@
-import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
-import { useEffect, useState } from "react";
+import {loadTossPayments, ANONYMOUS} from "@tosspayments/tosspayments-sdk";
+import {useEffect, useState} from "react";
+import axios from "axios";
 
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const customerKey = "wCevUFwIF9ry5jKuT1aoH";
@@ -23,11 +24,10 @@ export function CheckoutPage() {
         const phone = Number(urlParams.get("phone"));
         const customerNameParams = urlParams.get("name");
 
-        setAmount({ currency: "KRW", value: amountParams });
+        setAmount({currency: "KRW", value: amountParams});
         setOrderId(orderIdParams);
         setCustomerName(customerNameParams);
     }, []);
-
 
 
     useEffect(() => {
@@ -82,6 +82,20 @@ export function CheckoutPage() {
         widgets.setAmount(amount);
     }, [widgets, amount]);
 
+    const cancelOrder = async (orderId) => {
+        try {
+            const response = await axios.post('http://localhost:8080/api/order/cancel', null, {
+                params: {orderId}
+            });
+            console.log('주문 취소 성공:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('주문 취소 실패:', error);
+            throw error;
+        }
+    };
+
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-green-50 px-6 py-10">
             <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md">
@@ -124,11 +138,20 @@ export function CheckoutPage() {
                 {/* 취소 버튼 */}
                 <button
                     className="w-full mt-4 rounded-xl py-6 text-2xl font-bold shadow
-                           bg-black text-white hover:bg-gray-800 transition"
-                    onClick={() => window.history.back()}
+         bg-black text-white hover:bg-gray-800 transition"
+                    onClick={async () => {
+                        try {
+                            await cancelOrder(orderId);
+                            alert("주문이 취소되었습니다.");
+                            window.location.href = "/"; // 또는 원하는 페이지로 리디렉션
+                        } catch (err) {
+                            alert("주문 취소에 실패했습니다.");
+                        }
+                    }}
                 >
                     취소
                 </button>
+
             </div>
         </div>
 

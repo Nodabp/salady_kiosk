@@ -9,6 +9,6 @@ export const router = createBrowserRouter([
     { path: "/toss/Checkout", element: <CheckoutPage /> },
     { path: "/toss/success", element: <SuccessPage /> },
     { path: "/toss/fail", element: <FailPage /> },
-    { path: "/", element: <Index/> },
-    { path: "/toss/complete", element: <Complete/>},
+    { path: "/", element: <Index/>, errorElement: <FailPage /> },
+    { path: "/toss/complete", element: <Complete/> },
 ]);

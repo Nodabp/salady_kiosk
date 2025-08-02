@@ -7,11 +7,18 @@ export default function PointInputModal({ user, cartItems, onBack, onConfirm }) 
 
     const handleApply = async () => {
         const pointValue = Number(pointInput);
-        if (pointValue < 3000 || pointValue % 1000 !== 0 || pointValue > user.availablePoints) {
-            setError("포인트는 3,000원 이상, 1,000원 단위로 사용 가능합니다.");
+        if (pointValue < 3000) {
+            setError("포인트는 최소 3,000원부터 사용 가능합니다.");
             return;
         }
-
+        if (pointValue % 1000 !== 0) {
+            setError("포인트는 1,000원 단위로만 사용 가능합니다.");
+            return;
+        }
+        if (pointValue > user.availablePoints) {
+            setError("보유 포인트를 초과할 수 없습니다.");
+            return;
+        }
         const priceRes = await axios.post("http://localhost:8080/api/price/details", {
             userId: user.id,
             pointAmount: pointValue,
@@ -37,6 +44,9 @@ export default function PointInputModal({ user, cartItems, onBack, onConfirm }) 
                 <p className="mb-2">보유 포인트: {user.availablePoints} P</p>
                 <input
                     type="number"
+                    min="3000"
+                    step="1000"
+                    max={user.availablePoints}
                     placeholder="포인트 사용 (1000원 단위)"
                     value={pointInput}
                     onChange={(e) => setPointInput(e.target.value)}
@@ -53,12 +63,26 @@ export default function PointInputModal({ user, cartItems, onBack, onConfirm }) 
                             {num}
                         </button>
                     ))}
+                    {/*<button*/}
+                    {/*    onClick={() => setPointInput(prev => prev.slice(0, -1))}*/}
+                    {/*    className="bg-white-100 border rounded p-2 text-sm hover:bg-red-200"*/}
+                    {/*>*/}
+                    {/*    ← 삭제*/}
+                    {/*</button>*/}
                     <button
-                        onClick={() => setPointInput(prev => prev.slice(0, -1))}
-                        className="bg-white-100 border rounded p-2 text-sm hover:bg-red-200"
+                        onClick={() => setPointInput(prev => (prev + "000").slice(0, 11))}
+                        className="bg-gray-50 rounded p-2 text-xl font-bold hover:bg-green-100"
                     >
-                        ← 삭제
+                        000
                     </button>
+
+                    <button
+                        onClick={() => setPointInput("")}
+                        className="bg-gray-50 rounded p-2 text-xl font-bold hover:bg-green-100"
+                    >
+                        Clear
+                    </button>
+
                 </div>
                 <div className="flex space-x-2 mt-4">
                     <button onClick={onBack} className="flex-1 py-2 bg-gray-200 rounded">뒤로</button>

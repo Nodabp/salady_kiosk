@@ -65,13 +65,11 @@ export default function KioskPage() {
     //  장바구니 모달 열기
     const handleOpenCartModal = () => {
         setIsCartModalOpen(true);
-        console.log("모달열기")
     };
 
     //  장바구니 모달 닫기
     const handleCloseCartModal = () => {
         setIsCartModalOpen(false);
-        console.log("모달닫기")
     };
 
     const handleUpdateItem = (index, newQuantity) => {

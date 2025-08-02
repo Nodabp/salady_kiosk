@@ -22,6 +22,7 @@ export default function PhoneNumberModal({onClose, cartItems}) {
         }
         try {
             const userRes = await axios.get(`http://localhost:8080/api/users/lookup?phoneNumber=${phone}`);
+
             const foundUser = userRes.data;
 
             const pointRes = await axios.get(`http://localhost:8080/api/points/available?userId=${foundUser.id}`);
@@ -128,8 +129,14 @@ export default function PhoneNumberModal({onClose, cartItems}) {
                             </button>
                         ))}
                         <button
+                            onClick={() => setPhone("")}
+                            className="bg-gray-50 rounded p-2 text-xl font-bold hover:bg-green-100"
+                        >
+                            Clear
+                        </button>
+                        <button
                             onClick={() => setPhone(prev => prev.slice(0, -1))}
-                            className="bg-white-100 border rounded p-2 text-sm hover:bg-red-200"
+                            className="bg-gray-200 rounded p-2 text-sm hover:bg-red-200"
                         >
                             ← 삭제
                         </button>

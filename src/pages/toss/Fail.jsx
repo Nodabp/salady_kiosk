@@ -21,7 +21,7 @@ export function FailPage() {
     }, [navigate]);
 
     return (
-        <div className="result wrapper">
+        <div className="min-h-screen bg-green-900 flex items-center justify-center">
             {/*<div className="box_section">*/}
             {/*    <h2>*/}
             {/*        결제 실패*/}
@@ -30,14 +30,14 @@ export function FailPage() {
             {/*    <p>{`실패 사유: ${searchParams.get("message")}`}</p>*/}
             {/*</div>*/}
 
-            <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md text-center">
-                <h1 className="text-2xl font-bold mb-4">주문 실패</h1>
-                <p className="text-lg mb-6">결제에 실패 하였습니다. </p>
-                <p className="text-sm text-gray-600">
-                    {countdown}초 후 메인 페이지로 이동합니다.
-                </p>
-            </div>
 
+        <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md text-center">
+            <h1 className="text-2xl font-bold mb-4">주문 실패</h1>
+            <p className="text-lg mb-6">다시 주문을 시도해 주세요</p>
+            <p className="text-sm text-gray-600">
+                {countdown}초 후 메인 페이지로 이동합니다.
+            </p>
         </div>
+    </div>
     );
 }
