@@ -127,7 +127,7 @@ export default function OptionModal({ menu, onClose, onAddToCart }) {
                 </div>
 
                 {/* 버튼 */}
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                     <button
                         onClick={onClose}
                         className="px-6 py-3 bg-gray-300 rounded-lg text-lg font-semibold w-1/3"

@@ -63,12 +63,6 @@ export default function PointInputModal({ user, cartItems, onBack, onConfirm }) 
                             {num}
                         </button>
                     ))}
-                    {/*<button*/}
-                    {/*    onClick={() => setPointInput(prev => prev.slice(0, -1))}*/}
-                    {/*    className="bg-white-100 border rounded p-2 text-sm hover:bg-red-200"*/}
-                    {/*>*/}
-                    {/*    ← 삭제*/}
-                    {/*</button>*/}
                     <button
                         onClick={() => setPointInput(prev => (prev + "000").slice(0, 11))}
                         className="bg-gray-50 rounded p-2 text-xl font-bold hover:bg-green-100"
@@ -86,7 +80,7 @@ export default function PointInputModal({ user, cartItems, onBack, onConfirm }) 
                 </div>
                 <div className="flex space-x-2 mt-4">
                     <button onClick={onBack} className="flex-1 py-2 bg-gray-200 rounded">뒤로</button>
-                    <button onClick={handleApply} className="flex-1 py-2 bg-green-600 text-white rounded">적용</button>
+                    <button onClick={handleApply} className="flex-1 py-2 bg-green-900 text-white rounded">적용</button>
                 </div>
             </div>
         </div>

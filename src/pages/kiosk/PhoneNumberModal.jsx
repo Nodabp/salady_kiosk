@@ -158,21 +158,24 @@ export default function PhoneNumberModal({onClose, cartItems}) {
                     ) : (
                         <div className="mt-4">
                             <p className="mb-2">사용 가능 포인트: {user.availablePoints} P</p>
-                            <button
-                                onClick={() => setIsPointModalOpen(true)}
-                                className="px-4 py-2 bg-green-600 text-white rounded"
-                            >
-                                포인트 사용하기
-                            </button>
 
-                            <button
-                                onClick={() => setIsConfirmOpen(true)}
-                                className="px-4 py-2 bg-green-600 text-white rounded"
-                            >
-                                바로 결제하기
-                            </button>
+                            <div className="flex gap-2 mb-2">
+                                <button
+                                    onClick={() => setIsPointModalOpen(true)}
+                                    className="flex-1 px-4 py-2 bg-green-900 text-white rounded"
+                                >
+                                    포인트 사용하기
+                                </button>
 
-                            <button onClick={onClose} className="w-full mt-2 py-2 bg-gray-200 rounded">
+                                <button
+                                    onClick={() => setIsConfirmOpen(true)}
+                                    className="flex-1 px-4 py-2 bg-green-900 text-white rounded"
+                                >
+                                    바로 결제하기
+                                </button>
+                            </div>
+
+                            <button onClick={onClose} className="w-full py-2 bg-gray-200 rounded">
                                 취소
                             </button>
                         </div>

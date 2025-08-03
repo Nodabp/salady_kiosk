@@ -42,7 +42,7 @@ export default function OrderConfirmModal({cartItems, finalPrice, onConfirm, onC
                 <div className="flex space-x-2">
                     <button
                         onClick={onConfirm}
-                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                        className="flex-1 px-4 py-2 bg-green-900 text-white rounded hover:bg-green-700"
                     >
                         결제 진행
                     </button>
