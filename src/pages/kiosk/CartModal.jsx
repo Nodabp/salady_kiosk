@@ -1,6 +1,6 @@
 export default function CartModal({ cartItems, onClose, onUpdateItem, onRemoveItem, onUpdateOption }) {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
             <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl">
                 <h2 className="text-2xl font-bold text-green-900 mb-4">장바구니</h2>
 
