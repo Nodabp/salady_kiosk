@@ -1,6 +1,5 @@
-// CartPanel.jsx
 import { useMemo, useState } from "react";
-import PhoneNumberModal from "./PhoneNumberModal.jsx";
+import PhoneNumberModal from "../../component/other/PhoneNumberModal.jsx";
 
 export default function CartPanel({ cartItems, onOpenModal }) {
     const [showPhoneModal, setShowPhoneModal] = useState(false);
@@ -35,6 +34,7 @@ export default function CartPanel({ cartItems, onOpenModal }) {
                 주문 완료
             </button>
             }
+
             {/* 회원/비회원 결제 모달 */}
             {showPhoneModal && (
                 <PhoneNumberModal

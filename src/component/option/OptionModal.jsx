@@ -6,32 +6,37 @@ export default function OptionModal({ menu, onClose, onAddToCart }) {
 
     const updateQuantity = (optionId, newQuantity) => {
         setSelections((prev) => {
-            const without = prev.filter((opt) => opt.optionId !== optionId);
-            if (newQuantity > 0) {
-                return [...without, { optionId, quantity: newQuantity }];
-            } else {
-                return without;
-            }
+            const filtered = prev.filter((opt) => opt.optionId !== optionId);
+            return newQuantity > 0
+                ? [...filtered, { optionId, quantity: newQuantity }]
+                : filtered;
         });
     };
 
-    const getQuantity = (optionId) => {
-        const found = selections.find((opt) => opt.optionId === optionId);
-        return found?.quantity ?? 0;
-    };
+    const getQuantity = (optionId) =>
+        selections.find((opt) => opt.optionId === optionId)?.quantity ?? 0;
 
-    // 총액 계산
-    const totalPrice = useMemo(() => {
-        // 옵션 단가 = Σ(옵션 개당 가격 × 옵션 개수)
-        const optionUnitPrice = selections.reduce((sum, s) => {
+    const calculateOptionPrice = () =>
+        selections.reduce((sum, s) => {
             const opt = menu.menuOptions.find((o) => o.id === s.optionId);
             return sum + (opt?.extraPrice || 0) * s.quantity;
         }, 0);
 
-        // 메뉴 총액 = (기본 가격 + 옵션 단가) × 메뉴 수량
-        return (menu.price + optionUnitPrice) * quantity;
-    }, [menu, quantity, selections]);
+    const calculateTotalPrice = () =>
+        (menu.price + calculateOptionPrice()) * quantity;
 
+    const totalPrice = useMemo(calculateTotalPrice, [menu, quantity, selections]);
+
+    const getSelectedOptions = () =>
+        selections.map((s) => {
+            const opt = menu.menuOptions.find((o) => o.id === s.optionId);
+            return {
+                optionId: s.optionId,
+                quantity: s.quantity,
+                extraPrice: opt?.extraPrice || 0,
+                name: opt?.name || "",
+            };
+        });
 
     const handleSubmit = () => {
         const orderData = {
@@ -39,21 +44,9 @@ export default function OptionModal({ menu, onClose, onAddToCart }) {
             name: menu.name,
             basePrice: menu.price,
             quantity,
-            options: selections.map((s) => {
-                const opt = menu.menuOptions.find((o) => o.id === s.optionId);
-                return {
-                    optionId: s.optionId,
-                    quantity: s.quantity,
-                    extraPrice: opt ? opt.extraPrice : 0,
-                    name: opt ? opt.name : "",
-                };
-            }),
-            totalPrice: (menu.price + selections.reduce((sum, s) => {
-                const opt = menu.menuOptions.find((o) => o.id === s.optionId);
-                return sum + (opt?.extraPrice || 0) * s.quantity;
-            }, 0)) * quantity,
+            options: getSelectedOptions(),
+            totalPrice: calculateTotalPrice(),
         };
-
         onAddToCart(orderData);
         onClose();
     };
@@ -84,7 +77,8 @@ export default function OptionModal({ menu, onClose, onAddToCart }) {
                                 <div className="flex items-center space-x-2">
                                     <button
                                         onClick={() => updateQuantity(opt.id, getQuantity(opt.id) - 1)}
-                                        className="px-3 py-1 bg-gray-200 rounded text-lg"
+                                        className="px-3 py-1 bg-gray-200 rounded text-lg disabled:opacity-50"
+                                        disabled={getQuantity(opt.id) === 0}
                                     >
                                         −
                                     </button>

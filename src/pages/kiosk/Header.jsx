@@ -1,5 +1,3 @@
-// import logo from '../assets/logo.png';
-
 export default function Header() {
     return (
         <header className="flex items-center justify-center bg-green-900 text-white py-4 shadow-md">

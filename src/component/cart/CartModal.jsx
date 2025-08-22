@@ -23,7 +23,7 @@ export default function CartModal({ cartItems, onClose, onUpdateItem, onRemoveIt
                                         >
                                             −
                                         </button>
-                                        <span className="w-8 text-center text-lg">{item.quantity}</span>
+                                        <span className="w-8 text-center text-lg ">{item.quantity}</span>
                                         <button
                                             onClick={() => onUpdateItem(idx, item.quantity + 1)}
                                             className="px-3 py-1 bg-gray-200 rounded text-lg"

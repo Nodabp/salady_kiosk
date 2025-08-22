@@ -1,9 +1,14 @@
-import {useState} from "react";
-import axios from "axios";
-import OrderConfirmModal from "./OrderConfirmModal";
-import PointInputModal from "./PointInputModal";
+import { useState } from "react";
+import {
+    getUserByPhoneNum,
+    getAvailablePoint,
+    priceVerification,
+    order
+} from "../../config/api.jsx";
+import OrderConfirmModal from "./OrderConfirmModal.jsx";
+import PointInputModal from "./PointInputModal.jsx";
 
-export default function PhoneNumberModal({onClose, cartItems}) {
+export default function PhoneNumberModal({ onClose, cartItems }) {
     const [phone, setPhone] = useState("");
     const [error, setError] = useState("");
     const [isMember, setIsMember] = useState(false);
@@ -12,7 +17,26 @@ export default function PhoneNumberModal({onClose, cartItems}) {
     const [finalPrice, setFinalPrice] = useState(null);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isPointModalOpen, setIsPointModalOpen] = useState(false);
-    const [priceDetails, setPriceDetails] = useState(null); // 할인 등등 정보 들어갈곳.
+    const [priceDetails, setPriceDetails] = useState(null);
+
+    const mapOrderItems = () =>
+        cartItems.map(item => ({
+            menuId: item.menuId,
+            quantity: item.quantity,
+            options: item.options.map(opt => ({
+                optionId: opt.optionId,
+                quantity: opt.quantity
+            }))
+        }));
+
+    const fetchPriceDetails = async (userId = null, pointAmount = 0) => {
+        const priceData = {
+            userId,
+            pointAmount,
+            items: mapOrderItems()
+        };
+        return await priceVerification(priceData);
+    };
 
     const handleLookup = async () => {
         setError("");
@@ -20,88 +44,56 @@ export default function PhoneNumberModal({onClose, cartItems}) {
             setError("휴대폰 번호를 올바르게 입력하세요.");
             return;
         }
+
         try {
-            const userRes = await axios.get(`http://localhost:8080/api/users/lookup?phoneNumber=${phone}`);
+            const foundUser = await getUserByPhoneNum(phone);
+            const availablePoints = Number(await getAvailablePoint(foundUser));
+            const priceRes = await fetchPriceDetails(foundUser.id, 0);
 
-            const foundUser = userRes.data;
-
-            const pointRes = await axios.get(`http://localhost:8080/api/points/available?userId=${foundUser.id}`);
-            const availablePoints = Number(pointRes.data);
-
-            const priceRes = await axios.post("http://localhost:8080/api/price/details", {
-                userId: foundUser.id,
-                pointAmount: 0,
-                items: cartItems.map(item => ({
-                    menuId: item.menuId,
-                    quantity: item.quantity,
-                    options: item.options.map(opt => ({
-                        optionId: opt.optionId,
-                        quantity: opt.quantity
-                    }))
-                }))
-            });
-
-            setUser({...foundUser, availablePoints});
+            setUser({ ...foundUser, availablePoints });
             setIsMember(true);
-            setFinalPrice(priceRes.data.finalTotalPrice);
-            setPriceDetails(priceRes.data.details); // 할인 내역 포함
+            setFinalPrice(priceRes.finalTotalPrice);
+            setPriceDetails(priceRes.details);
         } catch {
             setError("회원 정보가 없습니다. 비회원 결제를 이용하세요.");
         }
     };
 
     const handleGuestCheckout = async () => {
-        const priceRes = await axios.post("http://localhost:8080/api/price/details", {
-            userId: null,
-            pointAmount: 0,
-            items: cartItems.map(item => ({
-                menuId: item.menuId,
-                quantity: item.quantity,
-                options: item.options.map(opt => ({
-                    optionId: opt.optionId,
-                    quantity: opt.quantity
-                }))
-            }))
-        });
-        setFinalPrice(priceRes.data.finalTotalPrice);
+        const priceRes = await fetchPriceDetails(null, 0);
+        setFinalPrice(priceRes.finalTotalPrice);
         setIsMember(false);
-        setPriceDetails(priceRes.data.details); // 할인 내역 포함
+        setPriceDetails(priceRes.details);
         setIsConfirmOpen(true);
-
     };
 
     const handleConfirmPayment = async () => {
         try {
+            let name = "비회원";
+            let id = null;
 
-            let userRes;
-            let name, id;
-            if (phone) {
-                userRes = await axios.get(`http://localhost:8080/api/users/lookup?phoneNumber=${phone}`);
-                ({ name, id } = userRes.data); // 구조 분해 할당
+            if (isMember && phone) {
+                const userRes = await getUserByPhoneNum(phone);
+                name = userRes.name;
+                id = userRes.id;
             }
 
-            const res = await axios.post("http://localhost:8080/api/order", {
+            const orderData = {
                 userId: isMember ? id : null,
-                customerName: isMember ? name : "비회원",
-                customerMobile: phone ?? "010-0000-0000",
+                customerName: name,
+                customerMobile: phone || "01000000000",
                 customerEmail: "",
                 pointAmount: isMember ? Number(pointInput) : 0,
-                items: cartItems.map(item => ({
-                    menuId: item.menuId,
-                    quantity: item.quantity,
-                    options: item.options.map(opt => ({
-                        optionId: opt.optionId,
-                        quantity: opt.quantity
-                    }))
-                }))
-            });
+                items: mapOrderItems()
+            };
 
-            const {orderId, totalPrice} = res.data;
-            window.location.href = `/toss/checkout?orderId=${orderId}&amount=${totalPrice}&name=${encodeURIComponent(name || "비회원")}&phoneNumber=${phone ?? "010-0000-0000"}`;
+            const { orderId, totalPrice } = await order(orderData);
+            window.location.href = `/toss/checkout?orderId=${orderId}&amount=${totalPrice}&name=${encodeURIComponent(name)}&phoneNumber=${phone || "01000000000"}`;
         } catch (err) {
-            console.warn("주문 생성에 실패했어요!",err);
+            console.warn("주문 생성에 실패했어요!", err);
         }
     };
+
 
     return (
         <>
